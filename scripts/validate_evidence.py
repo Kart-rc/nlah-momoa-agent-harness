@@ -1,29 +1,23 @@
 #!/usr/bin/env python3
-"""Validate that implementation evidence is present enough for release review."""
+"""Validate IMPLEMENTATION_EVIDENCE.md (thin shim over validate_sections.py)."""
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
-REQUIRED_SECTIONS = ["## Summary", "## Files Created or Modified", "## Claims and Evidence"]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from validate_sections import resolve_target, validate_file  # noqa: E402
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate implementation evidence")
     parser.add_argument("run_dir")
     args = parser.parse_args()
-
-    evidence_path = Path(args.run_dir) / "IMPLEMENTATION_EVIDENCE.md"
-    if not evidence_path.exists():
-        print(f"Missing evidence file: {evidence_path}")
-        return 1
-    text = evidence_path.read_text(encoding="utf-8")
-    missing = [section for section in REQUIRED_SECTIONS if section not in text]
-    if missing:
-        print(f"Evidence file missing sections: {missing}")
-        return 1
-    print("Evidence structure check passed")
-    return 0
+    return validate_file(resolve_target(args.run_dir, "evidence"), "evidence")
 
 
 if __name__ == "__main__":

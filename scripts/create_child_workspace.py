@@ -5,18 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
-from datetime import datetime, timezone
+import sys
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
-def now_utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def append_jsonl(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(payload, sort_keys=True) + "\n")
+from _harness_lib import append_jsonl, now_utc_iso  # noqa: E402
 
 
 def main() -> int:
@@ -58,15 +54,17 @@ def main() -> int:
         "schema_version": "1.0",
         "child_id": args.child_id,
         "parent_run_dir": str(run_dir),
-        "created_at": now_utc(),
+        "created_at": now_utc_iso(),
         "status": "initialized",
     }
-    (child_dir / "state" / "child_metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    (child_dir / "state" / "child_metadata.json").write_text(
+        json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
+    )
 
     append_jsonl(
         orchestration_ledger,
         {
-            "timestamp": now_utc(),
+            "timestamp": now_utc_iso(),
             "event": "child_workspace_created",
             "child_id": args.child_id,
             "child_dir": str(child_dir),

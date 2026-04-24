@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "id": "requirements-to-architecture",
+  "display_name": "Requirements to Architecture",
+  "default_validation_tier": 2,
+  "required_inputs": [
+    "business_requirement_document",
+    "constraints",
+    "target_audience"
+  ],
+  "required_artifacts": [
+    "BRD_ANALYSIS.md",
+    "AMBIGUITY_REGISTER.md",
+    "CAPABILITY_MAP.md",
+    "FUNCTIONAL_REQUIREMENTS.md",
+    "NON_FUNCTIONAL_REQUIREMENTS.md",
+    "ARCHITECTURE_OPTIONS.md",
+    "HLD.md",
+    "ADR.md",
+    "LLD.md",
+    "TRACEABILITY_MATRIX.md",
+    "REVIEW_REPORT.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "coordinate BRD-to-architecture lifecycle",
+    "planner": "sequence analysis, options, and traceability",
+    "implementer": "produce HLD, LLD, and ADRs",
+    "reviewer": "challenge assumptions, coverage, and feasibility",
+    "independent_validator": "verify traceability and decision completeness",
+    "release_certifier": "approve architecture packet for handoff"
+  },
+  "validation_gates": [
+    "every functional requirement traces to architecture",
+    "non-functional requirements are addressed",
+    "architecture options are compared with rationale",
+    "ADRs capture accepted and rejected options",
+    "traceability matrix is complete"
+  ],
+  "release_requirements": [
+    "HLD, LLD, ADRs",
+    "traceability matrix",
+    "open assumptions and risks",
+    "review outcomes"
+  ]
+}

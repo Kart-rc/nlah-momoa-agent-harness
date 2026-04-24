@@ -24,18 +24,57 @@ NLAH-MoVE addresses these with:
 
 ---
 
-## Install into any Git repository
+## Install
 
-Use the setup script to install the harness into **any path inside any Git repo**.
+The harness installs into any path inside any Git repository. There are two
+installation modes: standalone (scripts only) and Claude Code (scripts plus a
+Claude Code skill, slash commands, and a subagent).
+
+### Standalone
 
 ```bash
-bash /path/to/nlah-momoa-agent-harness/scripts/setup_harness.sh --target /path/to/your/repo
+bash /path/to/nlah-momoa-agent-harness/scripts/setup_harness.sh \
+  --target /path/to/your/repo
 ```
 
-By default, this creates:
+Creates:
 
 ```text
 <your-repo>/.nlah-move-harness/
+  harness/      policy (stages, roles, rooms, task-type catalog)
+  templates/    run-level + task-type-specific artifact templates
+  scripts/      init, check, new-task-type, validators, smoke test
+  docs/         architecture + extension guide
+  examples/     example TASK.md per task family
+```
+
+### Claude Code
+
+Install the harness *and* a Claude Code skill + slash commands + subagent in
+one step:
+
+```bash
+bash /path/to/nlah-momoa-agent-harness/scripts/setup_harness.sh \
+  --target /path/to/your/repo \
+  --for-claude-code
+```
+
+This adds the following under your repo's `.claude/` directory:
+
+```text
+.claude/
+  skills/nlah-move/SKILL.md             activates the harness on matching tasks
+  commands/nlah-init.md                 /nlah-init <run-id> <task-type> [task.md]
+  commands/nlah-check.md                /nlah-check <run-dir>
+  commands/nlah-new-task-type.md        /nlah-new-task-type <id> "Display" ...
+  commands/nlah-validate-catalog.md     /nlah-validate-catalog
+  agents/nlah-independent-validator.md  independent validator subagent
+```
+
+Already have the harness installed and just want the Claude Code surface?
+
+```bash
+bash .nlah-move-harness/scripts/install_claude_code.sh --target .
 ```
 
 ### Setup script options
@@ -44,29 +83,149 @@ By default, this creates:
 bash scripts/setup_harness.sh --help
 ```
 
-- `--target PATH` path inside the target repository (default: current directory)
-- `--install-dir NAME` destination folder name under repo root (default: `.nlah-move-harness`)
-- `--force` overwrite an existing installation
-- `--dry-run` preview actions without writing files
+| Flag | Default | Effect |
+|---|---|---|
+| `--target PATH` | cwd | Any path inside the target repository |
+| `--install-dir NAME` | `.nlah-move-harness` | Folder name under repo root |
+| `--for-claude-code` | off | Also install the Claude Code skill/commands/agent |
+| `--claude-dir NAME` | `.claude` | Claude directory name |
+| `--force` | off | Overwrite an existing installation |
+| `--dry-run` | off | Print actions without writing files |
 
 ---
 
-## Quick start (after installation)
+## Invocation examples
+
+All examples assume the harness was installed at `.nlah-move-harness/` and
+that you're running commands from the repo root.
+
+### A. Generic task (no task type)
 
 ```bash
+# Point at any TASK.md; the harness creates runs/demo-001/ with common templates.
 python .nlah-move-harness/scripts/init_run.py \
   --task .nlah-move-harness/examples/simple-doc-task/TASK.md \
   --run-id demo-001
 
+# Run the full validation gauntlet (required files, manifest, sections).
 bash .nlah-move-harness/scripts/run_all_checks.sh runs/demo-001
-
-python .nlah-move-harness/scripts/create_child_workspace.py \
-  --run-dir runs/demo-001 \
-  --child-id phase-1 \
-  --task-contract runs/demo-001/PLAN.md
 ```
 
-The run workspace includes copied templates, ledgers, an artifact manifest, and placeholders for evidence and release documentation.
+### B. Task-type-aware run (recommended)
+
+```bash
+# Materialises task-specific artifacts (ISSUE_INTAKE.md, ROOT_CAUSE_ANALYSIS.md,
+# PATCH_PLAN.md, PR_SUMMARY.md, etc.) and records task-type + default tier
+# in state/run_metadata.json so downstream checks enforce the right contract.
+python .nlah-move-harness/scripts/init_run.py \
+  --task .nlah-move-harness/examples/github-issue-bug/TASK.md \
+  --run-id gh-214 \
+  --task-type github-issue
+
+ls runs/gh-214/
+# TASK.md  SCOPE_CONTRACT.md  PLAN.md  IMPLEMENTATION_EVIDENCE.md ...
+# ISSUE_INTAKE.md  ISSUE_CLASSIFICATION.md  ROOT_CAUSE_ANALYSIS.md
+# PATCH_PLAN.md  VALIDATION_EVIDENCE.md  PR_SUMMARY.md
+
+# Populate SCOPE_CONTRACT.md, PLAN.md, and the task-type artifacts.
+# Then:
+bash .nlah-move-harness/scripts/run_all_checks.sh runs/gh-214
+```
+
+### C. Delegating an isolated phase
+
+```bash
+python .nlah-move-harness/scripts/create_child_workspace.py \
+  --run-dir runs/gh-214 \
+  --child-id phase-1-reproduce \
+  --task-contract runs/gh-214/PLAN.md
+
+# Child gets its own contracts/, responses/, artifacts/, state/ under
+# runs/gh-214/children/phase-1-reproduce/.
+```
+
+### D. Adding a new task type
+
+```bash
+python .nlah-move-harness/scripts/new_task_type.py \
+  --id bug-bash \
+  --display-name "Bug Bash" \
+  --artifact BUG_BASH_INTAKE.md \
+  --artifact BUG_BASH_FINDINGS.md \
+  --artifact BUG_BASH_REPORT.md \
+  --keyword "bug bash" \
+  --keyword "hackathon" \
+  --default-validation-tier 1
+
+python .nlah-move-harness/scripts/validate_task_family_completeness.py
+bash .nlah-move-harness/scripts/test_harness.sh
+```
+
+See [`docs/adding-a-task-type.md`](docs/adding-a-task-type.md) for the full
+extension guide.
+
+### E. Smoke-testing the whole pipeline
+
+```bash
+bash .nlah-move-harness/scripts/test_harness.sh
+```
+
+Exercises task-family completeness, `init_run.py` with and without a task
+type, skeleton generation for task types without hand-written templates,
+`new_task_type.py` scaffolding, and the Claude Code install. Suitable for CI.
+
+---
+
+## Using the harness from Claude Code
+
+After installing with `--for-claude-code`, the following are available inside
+a Claude Code session rooted at your repo:
+
+### Slash commands
+
+| Command | What it does |
+|---|---|
+| `/nlah-init <run-id> <task-type> [task.md]` | Initialise a run workspace for the task at hand. If no `TASK.md` is supplied, Claude writes one from the current conversation. |
+| `/nlah-check <run-dir>` | Run the validation gauntlet. Reports the first failing gate and classifies it against the failure taxonomy. |
+| `/nlah-new-task-type <id> "Display" [artifacts] [keywords]` | Scaffold a new task type and validate the catalog. |
+| `/nlah-validate-catalog` | Validate the task-type catalog (registry + manifests + SKILL.md headings). |
+
+Example session:
+
+```
+User:   /nlah-init gh-214 github-issue
+Claude: Writes a TASK.md from the conversation, runs init_run.py, reports:
+          runs/gh-214/ with 6 task-specific artifacts materialised from templates.
+
+User:   Fix issue #214 per runs/gh-214/TASK.md.
+Claude: (activates the nlah-move skill, populates SCOPE_CONTRACT, PLAN,
+         implements, fills IMPLEMENTATION_EVIDENCE and PATCH_PLAN)
+
+User:   /nlah-check runs/gh-214
+Claude: Reports any failing gates and proposed repair tickets.
+```
+
+### Skill (auto-activates)
+
+The `nlah-move` skill activates on prompts that match multi-stage, evidence-
+heavy work (bug fixes, features, architecture, presentations, research). You
+don't invoke it directly — describe the task and Claude decides whether the
+harness is appropriate. The skill's description is intentionally specific so
+it doesn't fire on trivial requests.
+
+### Subagent
+
+The `nlah-independent-validator` subagent reads an in-progress run and
+produces an honest verdict without editing artifacts. Invoke it explicitly:
+
+```
+Use the nlah-independent-validator subagent to validate runs/gh-214.
+```
+
+The subagent runs the deterministic checks, verifies each acceptance
+criterion is traced to evidence, flags unresolved dissent, and writes
+`VALIDATION_REPORT.md` with a `PASS` / `PASS_WITH_CONDITIONS` / `FAIL`
+verdict.
 
 ---
 
@@ -93,7 +252,7 @@ Task Router
 
 ```text
 harness/              Harness policy, stages, roles, rooms, skills, task-type catalog
-templates/            Reusable run artifacts and task-type-specific templates
+templates/            Reusable run artifacts, task-type templates, Claude Code surface
 scripts/              Deterministic validation and workspace helper scripts
 docs/                 Explanatory docs for architecture and execution flow
 examples/             Example TASK.md inputs by task family
@@ -112,13 +271,25 @@ runs/                 Generated run workspaces, ignored except for .gitkeep
 
 ---
 
-## Common task families
+## Task families
 
-1. GitHub issue resolution (bug, enhancement, vulnerability, dependency upgrade).
-2. Brownfield feature delivery.
-3. Greenfield application delivery.
-4. Presentation development (leadership, pitch, technical stakeholder).
-5. Requirements-to-architecture (BRD analysis, HLD, LLD, ADR, traceability).
+The machine-readable catalog lives in
+[`harness/task-types/registry.json`](harness/task-types/registry.json). At the
+time of writing:
+
+1. `github-issue` (bug, enhancement, vulnerability, dependency-upgrade, build/test-failure, perf, docs)
+2. `brownfield-feature`
+3. `greenfield-application`
+4. `presentation` (leadership, pitch, technical-stakeholder, roadmap, architecture-review, incident-review)
+5. `requirements-to-architecture`
+6. `research-analysis`
+7. `generic-documentation`
+8. `generic-coding`
+9. `requirements-to-prototype-options`
+
+Each has a sibling `task-type.json` manifest declaring required artifacts,
+default validation tier, role model, and validation gates. This manifest is
+what scripts consume; the prose `SKILL.md` is what humans and agents read.
 
 ---
 
@@ -127,7 +298,7 @@ runs/                 Generated run workspaces, ignored except for .gitkeep
 A run is complete only when:
 
 1. The scope contract is satisfied.
-2. Required artifacts exist.
+2. Required artifacts exist (common + task-type-specific).
 3. Validation gates pass.
 4. Evidence is written.
 5. Critical dissent is resolved.

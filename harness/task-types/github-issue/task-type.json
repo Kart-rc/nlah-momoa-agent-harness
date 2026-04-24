@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "id": "github-issue",
+  "display_name": "GitHub Issue",
+  "default_validation_tier": 2,
+  "required_inputs": [
+    "issue_url_or_text_or_stack_trace"
+  ],
+  "required_artifacts": [
+    "ISSUE_INTAKE.md",
+    "ISSUE_CLASSIFICATION.md",
+    "ROOT_CAUSE_ANALYSIS.md",
+    "PATCH_PLAN.md",
+    "VALIDATION_EVIDENCE.md",
+    "PR_SUMMARY.md"
+  ],
+  "templates_dir": "github-issue",
+  "role_model": {
+    "orchestrator": "coordinate issue lifecycle and compliance gates",
+    "planner": "produce patch plan and risk-aware execution sequence",
+    "implementer": "remediate issue and capture implementation evidence",
+    "reviewer": "challenge root cause and fix completeness",
+    "independent_validator": "validate fix independently from implementer reasoning",
+    "release_certifier": "certify patch readiness and residual risk statement"
+  },
+  "validation_gates": [
+    "root cause is documented",
+    "patch is implemented",
+    "relevant tests pass",
+    "issue acceptance criteria are satisfied",
+    "PR summary explains what changed and why"
+  ],
+  "release_requirements": [
+    "issue class",
+    "root cause summary",
+    "fix evidence",
+    "validation outcomes",
+    "explicit residual risks"
+  ]
+}

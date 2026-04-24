@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "id": "generic-coding",
+  "display_name": "Generic Coding Task",
+  "default_validation_tier": 2,
+  "required_inputs": [
+    "coding_objective",
+    "acceptance_criteria"
+  ],
+  "required_artifacts": [
+    "TASK_INTAKE.md",
+    "IMPLEMENTATION_PLAN.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "select validation tier and enforce gates",
+    "planner": "produce an execution plan proportional to change risk",
+    "implementer": "complete changes and implementation evidence",
+    "reviewer": "challenge assumptions and code-level quality",
+    "independent_validator": "verify outcomes without implementer bias",
+    "release_certifier": "confirm completion against scope contract"
+  },
+  "validation_gates": [
+    "acceptance criteria are satisfied",
+    "deterministic checks pass or are explicitly waived",
+    "risks and tradeoffs are documented",
+    "unrelated changes are avoided"
+  ],
+  "release_requirements": [
+    "what changed",
+    "why",
+    "how validated",
+    "known limitations or follow-up"
+  ]
+}

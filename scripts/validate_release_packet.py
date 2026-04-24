@@ -1,37 +1,23 @@
 #!/usr/bin/env python3
-"""Validate release packet structure."""
+"""Validate RELEASE_PACKET.md (thin shim over validate_sections.py)."""
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
-REQUIRED_SECTIONS = [
-    "## Release Verdict",
-    "## Summary",
-    "## Scope Satisfied",
-    "## Artifacts",
-    "## Validation Performed",
-    "## Evidence References",
-    "## Open Risks",
-]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from validate_sections import resolve_target, validate_file  # noqa: E402
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate release packet")
     parser.add_argument("run_dir")
     args = parser.parse_args()
-
-    release_path = Path(args.run_dir) / "RELEASE_PACKET.md"
-    if not release_path.exists():
-        print(f"Missing release packet: {release_path}")
-        return 1
-    text = release_path.read_text(encoding="utf-8")
-    missing = [section for section in REQUIRED_SECTIONS if section not in text]
-    if missing:
-        print(f"Release packet missing sections: {missing}")
-        return 1
-    print("Release packet structure check passed")
-    return 0
+    return validate_file(resolve_target(args.run_dir, "release-packet"), "release-packet")
 
 
 if __name__ == "__main__":

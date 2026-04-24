@@ -2,49 +2,38 @@
 
 ## Purpose
 
-Classify a user task into a task family and load the matching task-type harness.
+Classify a user task into a task family and load the matching task-type
+harness.
 
-## Supported Task Families
+## Source of truth
 
-1. GitHub Issue
-2. Brownfield Feature
-3. Greenfield Application
-4. Presentation / Deck Creation
-5. Requirements to Architecture
-6. HLD / LLD / ADR Creation
-7. Research / Analysis
-8. Generic Documentation
-9. Generic Coding Task
-10. Requirements to Prototype Options
+The task-type catalog is [`harness/task-types/registry.json`](./task-types/registry.json).
+Each entry declares `id`, `display_name`, `keywords`, `variants`, and
+`default_validation_tier`. Routing logic should consume the registry rather
+than hardcoding a list.
 
 ## Routing Rules
 
-If the task references:
-
-- GitHub issue, ticket, bug, failing test, stack trace: use `github-issue`.
-- CVE, vulnerability, dependency risk, or security fix: use `github-issue/vulnerability`.
-- library version, framework upgrade, or dependency upgrade: use `github-issue/dependency-upgrade`.
-- existing codebase, brownfield, add feature, or modify existing app: use `brownfield-feature`.
-- new app, new service, MVP, scaffold, or from scratch: use `greenfield-application`.
-- slides, presentation, pitch, leadership, or stakeholders: use `presentation`.
-- BRD, business requirement, architecture, HLD, LLD, or ADR: use `requirements-to-architecture`.
-- benchmark synthesis, literature review, landscape comparison, or exploratory analysis: use `research-analysis`.
-- docs rewrite, runbook, README cleanup, tutorials, or knowledge-base articles: use `generic-documentation`.
-- implementation request without a tighter family match: use `generic-coding`.
-- problem statement asks for multiple approach proposals, quick prototyping, and rubric-based selection: use `requirements-to-prototype-options`.
+Match the user request against the `keywords` of each registry entry. When
+multiple entries match, prefer the most specific (longest keyword match wins;
+tie-break to the entry appearing first in the registry). Variants listed in
+the registry (e.g., `github-issue` `variants: [vulnerability, dependency-upgrade, ...]`)
+let the router capture a subclass without requiring a separate task type.
 
 ## Output Contract
 
 Write `TASK_CLASSIFICATION.md` with:
 
-- selected task type
+- selected task type (matches a registry `id`)
+- selected variant if applicable
 - confidence score
 - routing rationale
 - missing inputs
-- required artifacts
-- suggested validation tier
+- required artifacts (copied from the task-type manifest)
+- suggested validation tier (defaults to the task-type's `default_validation_tier`)
 - ambiguity triggers
 
 ## Ambiguity Trigger
 
-Before planning, trigger ambiguity resolution if a missing input could materially change architecture, implementation, cost, risk, or audience fit.
+Before planning, trigger ambiguity resolution if a missing input could
+materially change architecture, implementation, cost, risk, or audience fit.

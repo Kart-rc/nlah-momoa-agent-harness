@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "id": "greenfield-application",
+  "display_name": "Greenfield Application",
+  "default_validation_tier": 2,
+  "required_inputs": [
+    "product_brief_or_problem_statement",
+    "target_users",
+    "constraints"
+  ],
+  "required_artifacts": [
+    "PRODUCT_BRIEF.md",
+    "MVP_SCOPE.md",
+    "ARCHITECTURE_OPTIONS.md",
+    "TECH_STACK_DECISION.md",
+    "PROJECT_SCAFFOLD_PLAN.md",
+    "IMPLEMENTATION_EVIDENCE.md",
+    "RUNBOOK.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "align scope, architecture decisions, and release gates",
+    "planner": "sequence MVP scope, architecture options, and build order",
+    "implementer": "scaffold and implement MVP",
+    "reviewer": "challenge architecture and MVP scope",
+    "independent_validator": "verify MVP runs and satisfies stated objectives",
+    "release_certifier": "certify MVP readiness and known gaps"
+  },
+  "validation_gates": [
+    "MVP scope is defined",
+    "architecture decision is documented",
+    "scaffold builds and runs",
+    "smoke tests pass",
+    "runbook covers start/stop/deploy"
+  ],
+  "release_requirements": [
+    "MVP scope",
+    "architecture decision rationale",
+    "smoke evidence",
+    "known gaps and next steps"
+  ]
+}

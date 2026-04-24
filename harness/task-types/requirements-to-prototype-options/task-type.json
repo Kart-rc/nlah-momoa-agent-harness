@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "id": "requirements-to-prototype-options",
+  "display_name": "Requirements to Prototype Options",
+  "default_validation_tier": 1,
+  "required_inputs": [
+    "problem_statement",
+    "evaluation_rubric_or_aspects"
+  ],
+  "required_artifacts": [
+    "PROBLEM_DEFINITION.md",
+    "OPTION_SET.md",
+    "PROTOTYPE_PLAN.md",
+    "PROTOTYPE_EVIDENCE.md",
+    "ARUBRIX_MATRIX.md",
+    "DECISION_SUMMARY.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "frame the decision and rubric dimensions",
+    "planner": "sequence option exploration and prototype depth",
+    "implementer": "prototype each option to the stated depth",
+    "reviewer": "challenge option framing, coverage, and scoring",
+    "independent_validator": "verify rubric scoring is evidence-backed",
+    "release_certifier": "approve the option decision packet"
+  },
+  "validation_gates": [
+    "at least two distinct options are explored",
+    "each option has prototype evidence",
+    "rubric scoring is justified",
+    "decision is traceable to the rubric"
+  ],
+  "release_requirements": [
+    "decision",
+    "rubric scoring rationale",
+    "prototype evidence",
+    "deferred questions"
+  ]
+}

@@ -1,25 +1,29 @@
 # Task-Type Catalog
 
-Task types route common work into purpose-built workflows, artifacts, and validation gates.
+Task types route common work into purpose-built workflows, artifacts, and
+validation gates.
 
-## MVP Task Families
+## Source of truth
 
-1. `github-issue`
-2. `brownfield-feature`
-3. `greenfield-application`
-4. `presentation`
-5. `requirements-to-architecture`
-6. `research-analysis`
-7. `generic-documentation`
-8. `generic-coding`
-9. `requirements-to-prototype-options`
+The machine-readable catalog lives in [`registry.json`](./registry.json). Each
+task type has a directory here containing:
 
-Each task family should define:
+- `SKILL.md` — prose skill document for humans and agents.
+- `task-type.json` — machine-readable manifest consumed by scripts.
+
+Scripts such as `init_run.py`, `check_required_files.py`, and
+`validate_task_family_completeness.py` read the manifest and registry. To add
+a new task type, see [`docs/adding-a-task-type.md`](../../docs/adding-a-task-type.md)
+or run `python scripts/new_task_type.py --help`.
+
+## Contract
+
+Every task type must declare:
 
 - purpose
 - required inputs
-- workflow
 - required artifacts
-- role model
+- workflow
 - validation gates
+- role model
 - release expectations

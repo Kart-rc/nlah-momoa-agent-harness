@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "id": "research-analysis",
+  "display_name": "Research / Analysis",
+  "default_validation_tier": 1,
+  "required_inputs": [
+    "research_question",
+    "scope_or_boundary"
+  ],
+  "required_artifacts": [
+    "RESEARCH_QUESTION.md",
+    "SOURCE_LOG.md",
+    "HYPOTHESES.md",
+    "ANALYSIS_NOTES.md",
+    "FINDINGS_SUMMARY.md",
+    "LIMITATIONS.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "align research question and source quality bar",
+    "planner": "sequence sources, hypotheses, and analysis passes",
+    "implementer": "gather sources, analyse, and draft findings",
+    "reviewer": "challenge source quality and inference validity",
+    "independent_validator": "verify claims trace to sources",
+    "release_certifier": "approve findings packet with limitations"
+  },
+  "validation_gates": [
+    "research question is answered or explicitly bounded",
+    "sources are logged with provenance",
+    "hypotheses are tested or explicitly deferred",
+    "claims trace to evidence",
+    "limitations are stated"
+  ],
+  "release_requirements": [
+    "findings summary",
+    "evidence trail",
+    "limitations",
+    "follow-up questions"
+  ]
+}
