@@ -3,16 +3,20 @@ set -euo pipefail
 
 print_usage() {
   cat <<'USAGE'
-Usage: setup_harness.sh [--target PATH] [--install-dir NAME] [--force] [--dry-run]
+Usage: setup_harness.sh [--target PATH] [--install-dir NAME] [--force] [--dry-run] [--for-claude-code] [--claude-dir NAME]
 
 Installs the NLAH-MoVE harness into a Git repository.
 
 Options:
-  --target PATH       Any path inside the target repository (default: current directory)
-  --install-dir NAME  Directory name under the repo root (default: .nlah-move-harness)
-  --force             Overwrite existing files in the install directory
-  --dry-run           Print actions without writing files
-  -h, --help          Show this help
+  --target PATH        Any path inside the target repository (default: current directory)
+  --install-dir NAME   Directory name under the repo root (default: .nlah-move-harness)
+  --force              Overwrite existing files in the install directory
+  --dry-run            Print actions without writing files
+  --for-claude-code    Also install the Claude Code skill, slash commands, and
+                       subagent into the target repo's .claude/ directory.
+  --claude-dir NAME    Name of the Claude directory (default: .claude). Only
+                       used when --for-claude-code is set.
+  -h, --help           Show this help
 USAGE
 }
 
@@ -20,6 +24,8 @@ TARGET_PATH="$(pwd)"
 INSTALL_DIR_NAME=".nlah-move-harness"
 FORCE=0
 DRY_RUN=0
+FOR_CLAUDE_CODE=0
+CLAUDE_DIR_NAME=".claude"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -38,6 +44,14 @@ while [[ $# -gt 0 ]]; do
     --dry-run)
       DRY_RUN=1
       shift
+      ;;
+    --for-claude-code)
+      FOR_CLAUDE_CODE=1
+      shift
+      ;;
+    --claude-dir)
+      CLAUDE_DIR_NAME="$2"
+      shift 2
       ;;
     -h|--help)
       print_usage
@@ -113,6 +127,13 @@ if [[ -f "$README_SRC" ]]; then
   run_cmd cp -a "$README_SRC" "$README_DST"
 fi
 
+if [[ $FOR_CLAUDE_CODE -eq 1 ]]; then
+  CC_ARGS=(--target "$TARGET_PATH" --harness-dir "$INSTALL_DIR_NAME" --claude-dir "$CLAUDE_DIR_NAME")
+  if [[ $FORCE -eq 1 ]]; then CC_ARGS+=(--force); fi
+  if [[ $DRY_RUN -eq 1 ]]; then CC_ARGS+=(--dry-run); fi
+  run_cmd bash "$SCRIPT_DIR/install_claude_code.sh" "${CC_ARGS[@]}"
+fi
+
 cat <<DONE
 
 Install complete.
@@ -122,3 +143,9 @@ Next steps:
   2) Initialize a run from your repo root with:
      python $INSTALL_DIR/scripts/init_run.py --task $INSTALL_DIR/examples/simple-doc-task/TASK.md --run-id demo-001
 DONE
+
+if [[ $FOR_CLAUDE_CODE -eq 1 ]]; then
+  cat <<DONE
+  3) In Claude Code, try: /nlah-validate-catalog
+DONE
+fi

@@ -45,9 +45,10 @@ for f in RESEARCH_QUESTION.md SOURCE_LOG.md HYPOTHESES.md ANALYSIS_NOTES.md FIND
 done
 python scripts/check_required_files.py "$TMP_RUNS/smoke-research"
 
-echo "[5/5] new_task_type scaffolding"
+echo "[5/6] new_task_type scaffolding"
 SCAFFOLD_DIR="$(mktemp -d)"
-trap 'rm -rf "$TMP_RUNS" "$SCAFFOLD_DIR"' EXIT
+CC_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_RUNS" "$SCAFFOLD_DIR" "$CC_DIR"' EXIT
 cp -a harness "$SCAFFOLD_DIR/"
 cp -a scripts "$SCAFFOLD_DIR/"
 (
@@ -59,6 +60,30 @@ cp -a scripts "$SCAFFOLD_DIR/"
     --artifact SMOKE_PLAN.md \
     --keyword smoke
   python scripts/validate_task_family_completeness.py
+)
+
+echo "[6/6] install_claude_code into a fresh repo"
+(
+  cd "$CC_DIR"
+  git init -q
+  touch .keep
+  git add .
+  git -c commit.gpgsign=false -c user.email=x@x -c user.name=x commit -qm init
+  bash "$REPO_ROOT/scripts/install_claude_code.sh" --target . --harness-dir .nlah-move-harness > /dev/null
+  for f in \
+    .claude/skills/nlah-move/SKILL.md \
+    .claude/commands/nlah-init.md \
+    .claude/commands/nlah-check.md \
+    .claude/commands/nlah-new-task-type.md \
+    .claude/commands/nlah-validate-catalog.md \
+    .claude/agents/nlah-independent-validator.md
+  do
+    test -f "$f" || { echo "Missing Claude Code file: $f"; exit 1; }
+    if grep -q '@@HARNESS_DIR@@' "$f"; then
+      echo "Placeholder not substituted in: $f"
+      exit 1
+    fi
+  done
 )
 
 echo "Harness smoke test passed."
