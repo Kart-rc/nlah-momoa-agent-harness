@@ -51,7 +51,7 @@ At least one of:
 
 ## Validation Gates
 
-Do not claim issue resolution unless root cause is documented, the patch is implemented, relevant tests pass, issue acceptance criteria are satisfied, and the PR summary explains what changed and why.
+Do not claim issue resolution unless root cause is documented, the patch is implemented, TDD evidence is captured (failing test before fix + passing test after fix), relevant tests pass, issue acceptance criteria are satisfied, and the PR summary explains what changed and why.
 
 ## Role Model
 
