@@ -51,3 +51,27 @@ Create audience-specific presentations with a clear narrative, decision objectiv
 - audience concerns are addressed
 - claims are evidence-backed or framed as assumptions
 - story can be delivered in target time
+
+## Role Model
+
+- orchestrator: align audience, objective, and review gates
+- planner: sequence storyline, content, and quality checks
+- implementer: produce narrative, slide structure, and speaker notes
+- reviewer: challenge framing, logic, and executive clarity
+- independent validator: verify evidence traceability and objective fit
+- release certifier: approve final deck packet for delivery
+
+## End-to-End Flow Coverage
+
+This task family covers the full lifecycle from intake to release:
+
+1. objective and audience intake
+2. ambiguity resolution for decision context
+3. plan and storyboard work phases
+4. draft, critique, and revise deliverables
+5. validate factual claims and narrative fit
+6. release certify with presentation readiness notes
+
+## Release Expectations
+
+Release must include final narrative, evidence-backed claims, reviewer risks, and presenter readiness notes.

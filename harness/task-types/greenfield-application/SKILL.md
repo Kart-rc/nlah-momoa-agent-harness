@@ -42,3 +42,27 @@ Create a new application from product intent through architecture, scaffold, bas
 - tests or smoke checks exist
 - setup instructions are usable
 - risks and deferred work are stated
+
+## Role Model
+
+- orchestrator: enforce stage-gate progression from idea to release
+- planner: map MVP scope into phased build and validation tracks
+- implementer: scaffold and implement the agreed baseline
+- reviewer: challenge architecture and delivery risks
+- independent validator: verify setup, smoke paths, and evidence quality
+- release certifier: certify launch readiness and deferred work
+
+## End-to-End Flow Coverage
+
+This task family maps to the full NLAH-MoVE lifecycle:
+
+1. intake and product intent capture
+2. ambiguity resolution on users, constraints, and boundaries
+3. scope contract and architecture planning
+4. scaffold and implementation work phases
+5. validation gauntlet and repair loop as needed
+6. release certification with runbook and deferred backlog
+
+## Release Expectations
+
+Release must include runnable setup instructions, baseline validation evidence, architecture rationale, and explicit deferred scope.

@@ -50,3 +50,27 @@ Convert business requirements into architecture artifacts, HLD, LLD, ADRs, and t
 - major trade-offs are documented
 - HLD and LLD are consistent
 - assumptions and risks are explicit
+
+## Role Model
+
+- orchestrator: maintain traceability from requirements to decisions
+- planner: structure architecture exploration and decision cadence
+- implementer: produce architecture artifacts and rationale
+- reviewer: challenge assumptions, trade-offs, and constraints
+- independent validator: verify consistency and requirement coverage
+- release certifier: certify architecture packet for stakeholder use
+
+## End-to-End Flow Coverage
+
+This task family executes all harness stages with architecture focus:
+
+1. intake and requirement normalization
+2. ambiguity resolution for non-functional constraints
+3. planning, optioning, and ADR-driven decisions
+4. synthesis into HLD/LLD and traceability artifacts
+5. independent validation and dissent closure
+6. release certification with risks and open decisions
+
+## Release Expectations
+
+Release must include traceability matrix, selected architecture with rationale, unresolved risks, and decision follow-ups.

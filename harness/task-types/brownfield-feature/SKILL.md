@@ -41,3 +41,27 @@ Add functionality to an existing application while preserving current behavior, 
 - blast radius is understood
 - failure and rollback paths are documented
 - observability and security impacts are considered
+
+## Role Model
+
+- orchestrator: route, gate, and sequence changes safely
+- planner: convert accepted scope into implementation and validation phases
+- implementer: ship incremental changes with evidence
+- reviewer: challenge design and regression assumptions
+- independent validator: verify behavior from evidence and tests
+- release certifier: approve release packet and residual risks
+
+## End-to-End Flow Coverage
+
+This task family maps to the full NLAH-MoVE lifecycle:
+
+1. intake and feature classification
+2. ambiguity resolution for constraints and acceptance criteria
+3. scope contract and blast-radius guardrails
+4. phased implementation and regression checks
+5. independent validation and dissent handling
+6. release certification with rollback notes
+
+## Release Expectations
+
+Release must include changed scope, regression evidence, known risks, rollback strategy, and operator-facing notes.
