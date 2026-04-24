@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "id": "brownfield-feature",
+  "display_name": "Brownfield Feature",
+  "default_validation_tier": 2,
+  "required_inputs": [
+    "feature_objective",
+    "target_system_context"
+  ],
+  "required_artifacts": [
+    "FEATURE_INTAKE.md",
+    "CURRENT_STATE.md",
+    "IMPACT_ANALYSIS.md",
+    "DESIGN_OPTIONS.md",
+    "IMPLEMENTATION_PLAN.md",
+    "TEST_PLAN.md",
+    "REGRESSION_EVIDENCE.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "coordinate brownfield change scope and integration",
+    "planner": "produce phased implementation plan with risk controls",
+    "implementer": "implement feature with regression-aware changes",
+    "reviewer": "challenge impact scope and regression exposure",
+    "independent_validator": "verify behaviour without introducing regressions",
+    "release_certifier": "approve release with impact notes"
+  },
+  "validation_gates": [
+    "current state is understood",
+    "impact is bounded and documented",
+    "existing tests pass",
+    "new behaviour is exercised by tests",
+    "no unrelated changes are introduced"
+  ],
+  "release_requirements": [
+    "feature summary",
+    "impact statement",
+    "test evidence",
+    "residual risks"
+  ]
+}

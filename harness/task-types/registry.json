@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "description": "Single source of truth for task types recognised by the NLAH-MoVE harness. When adding a new task type, add an entry here and a sibling task-type.json under the task-type directory.",
+  "task_types": [
+    {
+      "id": "github-issue",
+      "display_name": "GitHub Issue",
+      "keywords": ["github issue", "ticket", "bug", "failing test", "stack trace", "cve", "vulnerability", "dependency upgrade"],
+      "variants": ["bug", "enhancement", "vulnerability", "dependency-upgrade", "build-failure", "test-failure", "documentation-issue", "performance-issue"],
+      "default_validation_tier": 2
+    },
+    {
+      "id": "brownfield-feature",
+      "display_name": "Brownfield Feature",
+      "keywords": ["existing codebase", "brownfield", "add feature", "modify existing app"],
+      "variants": [],
+      "default_validation_tier": 2
+    },
+    {
+      "id": "greenfield-application",
+      "display_name": "Greenfield Application",
+      "keywords": ["new app", "new service", "mvp", "scaffold", "from scratch"],
+      "variants": [],
+      "default_validation_tier": 2
+    },
+    {
+      "id": "presentation",
+      "display_name": "Presentation / Deck",
+      "keywords": ["slides", "presentation", "pitch", "leadership", "stakeholders"],
+      "variants": ["leadership", "pitch", "technical-stakeholder", "roadmap", "architecture-review", "incident-review"],
+      "default_validation_tier": 1
+    },
+    {
+      "id": "requirements-to-architecture",
+      "display_name": "Requirements to Architecture",
+      "keywords": ["brd", "business requirement", "architecture", "hld", "lld", "adr"],
+      "variants": [],
+      "default_validation_tier": 2
+    },
+    {
+      "id": "research-analysis",
+      "display_name": "Research / Analysis",
+      "keywords": ["benchmark", "literature review", "landscape comparison", "exploratory analysis"],
+      "variants": [],
+      "default_validation_tier": 1
+    },
+    {
+      "id": "generic-documentation",
+      "display_name": "Generic Documentation",
+      "keywords": ["docs rewrite", "runbook", "readme cleanup", "tutorial", "knowledge-base"],
+      "variants": [],
+      "default_validation_tier": 1
+    },
+    {
+      "id": "generic-coding",
+      "display_name": "Generic Coding Task",
+      "keywords": ["implementation request", "refactor", "coding task"],
+      "variants": [],
+      "default_validation_tier": 2
+    },
+    {
+      "id": "requirements-to-prototype-options",
+      "display_name": "Requirements to Prototype Options",
+      "keywords": ["multiple approach proposals", "quick prototyping", "rubric-based selection"],
+      "variants": [],
+      "default_validation_tier": 1
+    }
+  ]
+}

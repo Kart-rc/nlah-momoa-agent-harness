@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "id": "presentation",
+  "display_name": "Presentation / Deck",
+  "default_validation_tier": 1,
+  "required_inputs": [
+    "audience",
+    "objective",
+    "desired_outcome",
+    "presentation_type"
+  ],
+  "required_artifacts": [
+    "AUDIENCE_BRIEF.md",
+    "MESSAGE_STRATEGY.md",
+    "DECK_OUTLINE.md",
+    "SLIDE_STORYBOARD.md",
+    "SPEAKER_NOTES.md",
+    "EXECUTIVE_SUMMARY.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "align audience, objective, and review gates",
+    "planner": "sequence storyline, content, and quality checks",
+    "implementer": "produce narrative, slide structure, and speaker notes",
+    "reviewer": "challenge framing, logic, and executive clarity",
+    "independent_validator": "verify evidence traceability and objective fit",
+    "release_certifier": "approve final deck packet for delivery"
+  },
+  "validation_gates": [
+    "each slide has one clear message",
+    "deck supports the stated decision or outcome",
+    "audience concerns are addressed",
+    "claims are evidence-backed or framed as assumptions",
+    "story fits in target time"
+  ],
+  "release_requirements": [
+    "final narrative",
+    "evidence-backed claims",
+    "reviewer risks",
+    "presenter readiness notes"
+  ]
+}

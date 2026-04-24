@@ -7,10 +7,12 @@ if [[ -z "$RUN_DIR" ]]; then
   exit 2
 fi
 
-python scripts/check_required_files.py "$RUN_DIR"
-python scripts/validate_manifest.py "$RUN_DIR"
-python scripts/validate_scope_contract.py "$RUN_DIR/SCOPE_CONTRACT.md"
-python scripts/validate_evidence.py "$RUN_DIR"
-python scripts/validate_release_packet.py "$RUN_DIR"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+python "$SCRIPT_DIR/check_required_files.py" "$RUN_DIR"
+python "$SCRIPT_DIR/validate_manifest.py" "$RUN_DIR"
+python "$SCRIPT_DIR/validate_sections.py" --contract scope-contract "$RUN_DIR/SCOPE_CONTRACT.md"
+python "$SCRIPT_DIR/validate_sections.py" --contract evidence "$RUN_DIR"
+python "$SCRIPT_DIR/validate_sections.py" --contract release-packet "$RUN_DIR"
 
 echo "All checks passed"

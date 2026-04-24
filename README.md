@@ -54,19 +54,44 @@ bash scripts/setup_harness.sh --help
 ## Quick start (after installation)
 
 ```bash
+# Generic run (no task-type-specific artifacts).
 python .nlah-move-harness/scripts/init_run.py \
   --task .nlah-move-harness/examples/simple-doc-task/TASK.md \
   --run-id demo-001
 
-bash .nlah-move-harness/scripts/run_all_checks.sh runs/demo-001
+# Task-type-aware run: materialises task-specific artifacts + records
+# the task type and default validation tier in state/run_metadata.json,
+# which downstream checks consume.
+python .nlah-move-harness/scripts/init_run.py \
+  --task .nlah-move-harness/examples/github-issue-bug/TASK.md \
+  --run-id demo-gh-001 \
+  --task-type github-issue
+
+bash .nlah-move-harness/scripts/run_all_checks.sh runs/demo-gh-001
 
 python .nlah-move-harness/scripts/create_child_workspace.py \
-  --run-dir runs/demo-001 \
+  --run-dir runs/demo-gh-001 \
   --child-id phase-1 \
-  --task-contract runs/demo-001/PLAN.md
+  --task-contract runs/demo-gh-001/PLAN.md
 ```
 
 The run workspace includes copied templates, ledgers, an artifact manifest, and placeholders for evidence and release documentation.
+
+## Adding a new task type
+
+See [`docs/adding-a-task-type.md`](docs/adding-a-task-type.md). In short:
+
+```bash
+python scripts/new_task_type.py \
+  --id my-task-type \
+  --display-name "My Task Type" \
+  --artifact MY_INTAKE.md --artifact MY_PLAN.md \
+  --keyword "my keyword" \
+  --default-validation-tier 2
+
+python scripts/validate_task_family_completeness.py
+bash scripts/test_harness.sh
+```
 
 ---
 

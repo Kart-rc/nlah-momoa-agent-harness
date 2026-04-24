@@ -80,7 +80,7 @@ run_cmd() {
   if [[ $DRY_RUN -eq 1 ]]; then
     echo "[dry-run] $*"
   else
-    eval "$@"
+    "$@"
   fi
 }
 
@@ -90,9 +90,9 @@ echo "  Repo:   $REPO_ROOT"
 echo "  Target: $INSTALL_DIR"
 
 if [[ $FORCE -eq 1 ]]; then
-  run_cmd "rm -rf \"$INSTALL_DIR\""
+  run_cmd rm -rf "$INSTALL_DIR"
 fi
-run_cmd "mkdir -p \"$INSTALL_DIR\""
+run_cmd mkdir -p "$INSTALL_DIR"
 
 for rel_path in "${SOURCES[@]}"; do
   src="$SOURCE_ROOT/$rel_path"
@@ -103,19 +103,14 @@ for rel_path in "${SOURCES[@]}"; do
     continue
   fi
 
-  if [[ -d "$src" ]]; then
-    run_cmd "mkdir -p \"$(dirname "$dst")\""
-    run_cmd "cp -a \"$src\" \"$dst\""
-  else
-    run_cmd "mkdir -p \"$(dirname "$dst")\""
-    run_cmd "cp -a \"$src\" \"$dst\""
-  fi
+  run_cmd mkdir -p "$(dirname "$dst")"
+  run_cmd cp -a "$src" "$dst"
 done
 
 README_SRC="$SOURCE_ROOT/README.md"
 README_DST="$INSTALL_DIR/HARNESS_README.md"
 if [[ -f "$README_SRC" ]]; then
-  run_cmd "cp -a \"$README_SRC\" \"$README_DST\""
+  run_cmd cp -a "$README_SRC" "$README_DST"
 fi
 
 cat <<DONE

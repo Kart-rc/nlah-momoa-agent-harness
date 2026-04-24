@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "id": "generic-documentation",
+  "display_name": "Generic Documentation",
+  "default_validation_tier": 1,
+  "required_inputs": [
+    "documentation_objective",
+    "audience"
+  ],
+  "required_artifacts": [
+    "DOC_OBJECTIVE.md",
+    "AUDIENCE_PROFILE.md",
+    "SOURCE_INDEX.md",
+    "DOC_DRAFT.md",
+    "FACT_CHECK_REPORT.md",
+    "STYLE_REVIEW.md"
+  ],
+  "templates_dir": null,
+  "role_model": {
+    "orchestrator": "align objective, audience, and review gates",
+    "planner": "sequence source gathering, drafting, and review",
+    "implementer": "produce the draft and revise",
+    "reviewer": "challenge accuracy, structure, and clarity",
+    "independent_validator": "fact-check and style-check",
+    "release_certifier": "approve doc for publication"
+  },
+  "validation_gates": [
+    "objective is addressed",
+    "claims are fact-checked or labelled as opinion",
+    "sources are cited",
+    "style matches target audience"
+  ],
+  "release_requirements": [
+    "final document",
+    "fact-check report",
+    "known gaps",
+    "sources"
+  ]
+}
