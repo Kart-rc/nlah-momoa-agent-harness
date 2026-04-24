@@ -12,6 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 python "$SCRIPT_DIR/check_required_files.py" "$RUN_DIR"
 python "$SCRIPT_DIR/validate_manifest.py" "$RUN_DIR"
 python "$SCRIPT_DIR/validate_sections.py" --contract scope-contract "$RUN_DIR/SCOPE_CONTRACT.md"
+python "$SCRIPT_DIR/validate_plan_rooms.py" "$RUN_DIR"
 python "$SCRIPT_DIR/validate_sections.py" --contract evidence "$RUN_DIR"
 python "$SCRIPT_DIR/validate_sections.py" --contract release-packet "$RUN_DIR"
 

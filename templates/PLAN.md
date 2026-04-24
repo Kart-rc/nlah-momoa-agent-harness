@@ -5,9 +5,9 @@
 
 ## Work Phases
 
-| Phase | Owner | Output | Validation |
-|---|---|---|---|
-| 1 |  |  |  |
+| Phase | Room | Role Pair | Owner | Output | Validation |
+|---|---|---|---|---|---|
+| 1 | planning | planner + scope auditor |  |  |  |
 
 ## Required Artifacts
 

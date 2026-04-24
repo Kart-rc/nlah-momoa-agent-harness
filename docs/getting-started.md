@@ -14,7 +14,7 @@ python scripts/init_run.py --task examples/simple-doc-task/TASK.md --run-id demo
 ## 2) Review and refine scope
 
 - Fill `runs/demo-001/SCOPE_CONTRACT.md`
-- Fill `runs/demo-001/PLAN.md`
+- Fill `runs/demo-001/PLAN.md` (each work phase must include `Room` + `Role Pair`)
 - Add traceability entries in `runs/demo-001/REQUIREMENT_TRACEABILITY.md`
 
 ## 3) Optionally create child workspaces
