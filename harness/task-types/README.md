@@ -9,6 +9,10 @@ Task types route common work into purpose-built workflows, artifacts, and valida
 3. `greenfield-application`
 4. `presentation`
 5. `requirements-to-architecture`
+6. `research-analysis`
+7. `generic-documentation`
+8. `generic-coding`
+9. `requirements-to-prototype-options`
 
 Each task family should define:
 

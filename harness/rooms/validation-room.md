@@ -9,6 +9,10 @@ Run deterministic and independent validation without implementation bias.
 - deterministic verifier
 - reviewer
 
+## Adversarial collaboration
+
+Use adversarial challenge to test for scope creep, missing work, and false-positive completion claims.
+
 ## Required outputs
 
 - validation findings
