@@ -77,6 +77,131 @@ Already have the harness installed and just want the Claude Code surface?
 bash .nlah-move-harness/scripts/install_claude_code.sh --target .
 ```
 
+### Claude Code quickstart (setup → install → run)
+
+Use this when your goal is to run the harness primarily from Claude Code.
+
+1) **Open a terminal at your repository root**
+
+```bash
+cd /path/to/your/repo
+```
+
+2) **Install the harness with Claude Code integration**
+
+```bash
+bash /path/to/nlah-momoa-agent-harness/scripts/setup_harness.sh \
+  --target . \
+  --for-claude-code
+```
+
+3) **Confirm the install**
+
+```bash
+test -f .nlah-move-harness/scripts/init_run.py && echo "Harness installed"
+test -f .claude/skills/nlah-move/SKILL.md && echo "Claude skill installed"
+test -f .claude/commands/nlah-init.md && echo "Slash commands installed"
+```
+
+4) **Start Claude Code in this repo**
+
+```bash
+claude
+```
+
+5) **Initialize a run from Claude Code**
+
+In Claude Code, run:
+
+```text
+/nlah-init demo-001 generic-coding
+```
+
+If you already have a task file, provide it explicitly:
+
+```text
+/nlah-init demo-001 generic-coding path/to/TASK.md
+```
+
+6) **Do the implementation work, then run checks**
+
+```text
+/nlah-check runs/demo-001
+```
+
+If checks fail, address the reported artifact gaps and run `/nlah-check` again
+until all gates pass.
+
+7) **(Optional) Ask for an independent validation pass**
+
+```text
+Use the nlah-independent-validator subagent to validate runs/demo-001.
+```
+
+The validator writes `VALIDATION_REPORT.md` with a release verdict.
+
+### Antigravity + Windsurf quickstart
+
+Antigravity and Windsurf do not currently have a dedicated installer in this
+repo (like `--for-claude-code`), but you can use the harness reliably with a
+shared setup:
+
+1) **Install the harness into your repository**
+
+```bash
+cd /path/to/your/repo
+bash /path/to/nlah-momoa-agent-harness/scripts/setup_harness.sh --target .
+```
+
+2) **Run from repo root so relative paths resolve**
+
+```bash
+pwd
+# should be /path/to/your/repo
+```
+
+3) **Create and initialize a run**
+
+```bash
+python .nlah-move-harness/scripts/init_run.py \
+  --task path/to/TASK.md \
+  --run-id demo-001 \
+  --task-type generic-coding
+```
+
+4) **In Antigravity or Windsurf, instruct the agent to follow the harness**
+
+Use this as your first message in a task:
+
+```text
+Use .nlah-move-harness/harness/SKILL.md as the operating workflow.
+Work only inside runs/demo-001/.
+Keep SCOPE_CONTRACT.md and PLAN.md updated before implementation.
+Write evidence to IMPLEMENTATION_EVIDENCE.md and VALIDATION_EVIDENCE.md.
+Before finalizing, run:
+bash .nlah-move-harness/scripts/run_all_checks.sh runs/demo-001
+```
+
+5) **Validate deterministically before you accept output**
+
+```bash
+bash .nlah-move-harness/scripts/run_all_checks.sh runs/demo-001
+```
+
+6) **(Optional) add helper aliases for parity with Claude Code commands**
+
+```bash
+alias nlah-init='python .nlah-move-harness/scripts/init_run.py'
+alias nlah-check='bash .nlah-move-harness/scripts/run_all_checks.sh'
+```
+
+Then you can use:
+
+```bash
+nlah-init --task path/to/TASK.md --run-id demo-001 --task-type generic-coding
+nlah-check runs/demo-001
+```
+
 ### Setup script options
 
 ```bash
@@ -180,6 +305,15 @@ type, skeleton generation for task types without hand-written templates,
 
 After installing with `--for-claude-code`, the following are available inside
 a Claude Code session rooted at your repo:
+
+### Recommended day-to-day flow in Claude Code
+
+1. Create a run with `/nlah-init <run-id> <task-type> [task.md]`.
+2. Complete artifacts in `runs/<run-id>/` (`SCOPE_CONTRACT.md`, `PLAN.md`,
+   implementation evidence, plus task-type artifacts).
+3. Run `/nlah-check runs/<run-id>` to execute the deterministic gauntlet.
+4. Fix any failed gates and re-run `/nlah-check`.
+5. Before release, invoke `nlah-independent-validator` for a separated verdict.
 
 ### Slash commands
 
