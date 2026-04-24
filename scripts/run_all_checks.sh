@@ -9,6 +9,7 @@ fi
 
 python scripts/check_required_files.py "$RUN_DIR"
 python scripts/validate_manifest.py "$RUN_DIR"
+python scripts/validate_scope_contract.py "$RUN_DIR/SCOPE_CONTRACT.md"
 python scripts/validate_evidence.py "$RUN_DIR"
 python scripts/validate_release_packet.py "$RUN_DIR"
 

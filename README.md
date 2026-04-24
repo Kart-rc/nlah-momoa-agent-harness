@@ -17,6 +17,7 @@ This repository is designed for humans or agent runtimes that can read markdown 
 ```bash
 python scripts/init_run.py --task examples/simple-doc-task/TASK.md --run-id demo-001
 bash scripts/run_all_checks.sh runs/demo-001
+python scripts/create_child_workspace.py --run-dir runs/demo-001 --child-id phase-1 --task-contract runs/demo-001/PLAN.md
 ```
 
 The generated run workspace contains copied templates, ledgers, an artifact manifest, and placeholders for evidence and release documentation.
