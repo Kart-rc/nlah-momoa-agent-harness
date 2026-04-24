@@ -49,6 +49,30 @@ At least one of:
 9. Independent review
 10. Release packet
 
-## Validation
+## Validation Gates
 
 Do not claim issue resolution unless root cause is documented, the patch is implemented, relevant tests pass, issue acceptance criteria are satisfied, and the PR summary explains what changed and why.
+
+## Role Model
+
+- orchestrator: coordinate issue lifecycle and compliance gates
+- planner: produce patch plan and risk-aware execution sequence
+- implementer: remediate issue and capture implementation evidence
+- reviewer: challenge root cause and fix completeness
+- independent validator: validate fix independently from implementer reasoning
+- release certifier: certify patch readiness and residual risk statement
+
+## End-to-End Flow Coverage
+
+This task family covers all harness stages:
+
+1. intake and issue classification
+2. ambiguity resolution for reproduction and scope boundaries
+3. scope contract and root-cause planning
+4. implementation, integration, and validation gauntlet
+5. repair loop for failed checks or dissent
+6. release certification with PR summary and evidence packet
+
+## Release Expectations
+
+Release must include issue class, root cause summary, fix evidence, validation outcomes, and explicit residual risks.
