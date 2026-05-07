@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Semantic Layer Playground — Day 1 (DataJunction)</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161a22;
+    --panel-2: #1d222c;
+    --ink: #e6e8ee;
+    --muted: #8a93a6;
+    --accent: #7aa2ff;
+    --good: #6cd2a6;
+    --warn: #ffb86b;
+    --metric: #f78fb3;
+    --dim: #7aa2ff;
+    --src: #6cd2a6;
+    --xform: #c792ea;
+    --cube: #ffb86b;
+    --edge: #3a4252;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding:18px 24px; border-bottom:1px solid #20242e; }
+  header h1 { margin:0; font-size:18px; font-weight:600; }
+  header p { margin:4px 0 0; color:var(--muted); font-size:13px; }
+  main { display:grid; grid-template-columns: 1.1fr 0.9fr; gap:16px;
+    padding:16px; min-height: calc(100vh - 64px); }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; } }
+  .panel { background:var(--panel); border:1px solid #20242e; border-radius:10px;
+    padding:14px 16px; }
+  .panel h2 { margin:0 0 10px; font-size:14px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .stack > * + * { margin-top: 16px; }
+  .legend { display:flex; flex-wrap:wrap; gap:10px; font-size:12px;
+    color:var(--muted); margin-bottom:8px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .swatch { width:10px; height:10px; border-radius:2px; display:inline-block; }
+  svg { width:100%; height:340px; display:block; background:var(--panel-2);
+    border-radius:8px; }
+  .node rect { stroke-width:1.5; }
+  .node text { fill:var(--ink); font-size:12px; font-weight:600;
+    pointer-events:none; }
+  .node text.sub { fill:var(--muted); font-size:10px; font-weight:400; }
+  .edge { stroke: var(--edge); stroke-width:1.5; fill:none;
+    marker-end:url(#arrow); }
+  .edge.active { stroke: var(--accent); stroke-width:2.5; }
+  .controls { display:grid; gap:10px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .row label { font-size:12px; color:var(--muted); min-width:80px; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:5px 10px;
+    background:var(--panel-2); border:1px solid #2a3040; border-radius:999px;
+    font-size:12px; cursor:pointer; user-select:none; }
+  .chip.on { background: rgba(122,162,255,.16); border-color: var(--accent);
+    color: var(--accent); }
+  .chip input { display:none; }
+  select, input[type=text] { background:var(--panel-2); color:var(--ink);
+    border:1px solid #2a3040; border-radius:6px; padding:6px 8px; font-size:13px; }
+  pre { margin:0; background:#0a0c11; border:1px solid #20242e; border-radius:8px;
+    padding:12px; overflow:auto; font-size:12.5px; line-height:1.5;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+  .kw { color:#7aa2ff; }
+  .fn { color:#f78fb3; }
+  .lit { color:#6cd2a6; }
+  .id { color:#e6e8ee; }
+  .cm { color:#56607a; font-style:italic; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid #20242e; }
+  th { color:var(--muted); font-weight:500; font-size:11px;
+    text-transform:uppercase; letter-spacing:.06em; }
+  td.num { text-align:right; font-variant-numeric: tabular-nums; }
+  .footnote { color:var(--muted); font-size:12px; margin-top:8px; }
+  .pill { display:inline-block; font-size:11px; padding:2px 7px; border-radius:4px;
+    background:#2a3040; color:var(--muted); margin-left:6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Semantic Layer Playground</h1>
+  <p>Day 1 — companion app for the DataJunction deep-dive. Pick a metric, slice it
+  by a dimension, add filters, and watch the same definition compile into SQL.</p>
+</header>
+
+<main>
+  <section class="panel stack">
+    <div>
+      <h2>Metric graph</h2>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--src)"></i>source</span>
+        <span><i class="swatch" style="background:var(--xform)"></i>transform</span>
+        <span><i class="swatch" style="background:var(--dim)"></i>dimension</span>
+        <span><i class="swatch" style="background:var(--metric)"></i>metric</span>
+        <span><i class="swatch" style="background:var(--cube)"></i>cube</span>
+      </div>
+      <svg id="graph" viewBox="0 0 760 340" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--edge)"></path>
+          </marker>
+        </defs>
+        <g id="edges"></g>
+        <g id="nodes"></g>
+      </svg>
+      <div class="footnote">Highlighted edges show the path the planner takes
+        for the current selection.</div>
+    </div>
+
+    <div>
+      <h2>Query builder</h2>
+      <div class="controls">
+        <div class="row">
+          <label>Metric</label>
+          <select id="metric">
+            <option value="dau">metrics.dau — distinct active users</option>
+            <option value="avg_session">metrics.avg_session_minutes — avg session length</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>Dimensions</label>
+          <span id="dims"></span>
+        </div>
+        <div class="row">
+          <label>Filters</label>
+          <span id="filters"></span>
+        </div>
+        <div class="row">
+          <label>Last N days</label>
+          <select id="days">
+            <option>7</option><option selected>30</option><option>90</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel stack">
+    <div>
+      <h2>Generated SQL <span class="pill" id="engine">trino</span></h2>
+      <pre id="sql"></pre>
+      <div class="footnote">Same metric definition. The planner walks the graph,
+        adds joins for dimensions, and emits dialect-specific SQL.</div>
+    </div>
+    <div>
+      <h2>Result preview</h2>
+      <table id="result"></table>
+      <div class="footnote">Computed against an in-browser toy warehouse so you can
+        see how filters and groupings change the answer.</div>
+    </div>
+    <div>
+      <h2>Definition (what a metric owner registers once)</h2>
+      <pre id="defn"></pre>
+    </div>
+  </section>
+</main>
+
+<script>
+//
+// 1. Toy warehouse — three "tables", in-memory.
+//
+const warehouse = (() => {
+  const countries = ["US","IN","BR","DE","JP"];
+  const tiers = ["free","premium"];
+  const users = [];
+  for (let i = 1; i <= 200; i++) {
+    users.push({
+      user_id: i,
+      country: countries[i % countries.length],
+      plan_tier: tiers[i % 2 === 0 ? 1 : 0],
+      signup_date: "2025-" + String(((i*3)%12)+1).padStart(2,"0") + "-01",
+    });
+  }
+  // 90 days of sessions, ~uneven activity per user
+  const sessions = [];
+  const today = new Date("2026-05-07");
+  for (let d = 0; d < 90; d++) {
+    const day = new Date(today); day.setDate(today.getDate() - d);
+    const iso = day.toISOString().slice(0,10);
+    for (const u of users) {
+      // not every user is active every day; premium users are stickier
+      const p = u.plan_tier === "premium" ? 0.55 : 0.25;
+      // deterministic pseudo-random
+      const r = Math.abs(Math.sin(u.user_id * 13.37 + d * 0.91));
+      if (r < p) {
+        const dur = 20 + Math.floor(r * 600); // seconds
+        sessions.push({
+          user_id: u.user_id,
+          event_date: iso,
+          duration_seconds: dur,
+        });
+      }
+    }
+  }
+  return { users, sessions };
+})();
+
+//
+// 2. The "graph": nodes + edges. This is the semantic layer model.
+//
+const graph = {
+  nodes: [
+    // sources
+    { id:"src.session", kind:"source", label:"fact_user_session",
+      sub:"warehouse",          x: 60, y: 60 },
+    { id:"src.user",    kind:"source", label:"dim_user",
+      sub:"warehouse",          x: 60, y:200 },
+    // transform
+    { id:"xf.active",   kind:"transform", label:"active_session",
+      sub:"duration ≥ 30s",     x:240, y: 60 },
+    // dimension
+    { id:"dim.user",    kind:"dimension", label:"dim_user",
+      sub:"country, plan_tier", x:240, y:200 },
+    // metrics
+    { id:"m.dau",       kind:"metric", label:"dau",
+      sub:"COUNT(DISTINCT user_id)", x:440, y: 30 },
+    { id:"m.avg",       kind:"metric", label:"avg_session_minutes",
+      sub:"AVG(duration)/60",   x:440, y:110 },
+    // cube
+    { id:"cube.eng",    kind:"cube", label:"daily_engagement",
+      sub:"dau + avg × user dims", x:640, y: 70 },
+  ],
+  edges: [
+    { from:"src.session", to:"xf.active",  why:"transform" },
+    { from:"xf.active",   to:"m.dau",      why:"metric"    },
+    { from:"xf.active",   to:"m.avg",      why:"metric"    },
+    { from:"src.user",    to:"dim.user",   why:"dimension" },
+    // FK declaration: session.user_id → dim_user
+    { from:"dim.user",    to:"xf.active",  why:"join (FK user_id)" },
+    { from:"m.dau",       to:"cube.eng",   why:"cube" },
+    { from:"m.avg",       to:"cube.eng",   why:"cube" },
+  ],
+};
+
+//
+// 3. Render the graph as SVG.
+//
+const W = 110, H = 44;
+const colorFor = k => ({
+  source:"var(--src)", transform:"var(--xform)",
+  dimension:"var(--dim)", metric:"var(--metric)", cube:"var(--cube)",
+})[k];
+
+function renderGraph(activeEdgeKeys) {
+  const ns = "http://www.w3.org/2000/svg";
+  const edgesG = document.getElementById("edges");
+  const nodesG = document.getElementById("nodes");
+  edgesG.innerHTML = ""; nodesG.innerHTML = "";
+  const byId = Object.fromEntries(graph.nodes.map(n => [n.id, n]));
+  for (const e of graph.edges) {
+    const a = byId[e.from], b = byId[e.to];
+    const ax = a.x + W, ay = a.y + H/2;
+    const bx = b.x,     by = b.y + H/2;
+    const cx = (ax + bx) / 2;
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("d", `M${ax},${ay} C${cx},${ay} ${cx},${by} ${bx},${by}`);
+    path.setAttribute("class",
+      "edge" + (activeEdgeKeys.has(e.from + "→" + e.to) ? " active" : ""));
+    edgesG.appendChild(path);
+  }
+  for (const n of graph.nodes) {
+    const g = document.createElementNS(ns, "g");
+    g.setAttribute("class","node");
+    g.setAttribute("transform",`translate(${n.x},${n.y})`);
+    const r = document.createElementNS(ns, "rect");
+    r.setAttribute("width", W); r.setAttribute("height", H);
+    r.setAttribute("rx", 6);
+    r.setAttribute("fill", "var(--panel)");
+    r.setAttribute("stroke", colorFor(n.kind));
+    g.appendChild(r);
+    const t = document.createElementNS(ns, "text");
+    t.setAttribute("x", 8); t.setAttribute("y", 18);
+    t.textContent = n.label; g.appendChild(t);
+    const s = document.createElementNS(ns, "text");
+    s.setAttribute("x", 8); s.setAttribute("y", 33);
+    s.setAttribute("class","sub"); s.textContent = n.sub; g.appendChild(s);
+    nodesG.appendChild(g);
+  }
+}
+
+//
+// 4. Query builder UI.
+//
+const dimChoices = [
+  { id:"country",   label:"dim_user.country" },
+  { id:"plan_tier", label:"dim_user.plan_tier" },
+];
+const filterChoices = [
+  { id:"premium_only", label:"plan_tier = 'premium'" },
+  { id:"us_only",      label:"country = 'US'" },
+];
+const state = {
+  metric:"dau", dims:new Set(), filters:new Set(), days:30,
+};
+
+function chip(parent, id, label, on, onChange) {
+  const el = document.createElement("label");
+  el.className = "chip" + (on ? " on" : "");
+  el.innerHTML = `<input type="checkbox"${on?" checked":""}> ${label}`;
+  el.querySelector("input").addEventListener("change", e => {
+    el.classList.toggle("on", e.target.checked);
+    onChange(e.target.checked);
+  });
+  parent.appendChild(el);
+}
+
+function mountControls() {
+  const dimsEl = document.getElementById("dims");
+  for (const d of dimChoices) {
+    chip(dimsEl, d.id, d.label, state.dims.has(d.id), v => {
+      v ? state.dims.add(d.id) : state.dims.delete(d.id);
+      rerender();
+    });
+  }
+  const filtersEl = document.getElementById("filters");
+  for (const f of filterChoices) {
+    chip(filtersEl, f.id, f.label, state.filters.has(f.id), v => {
+      v ? state.filters.add(f.id) : state.filters.delete(f.id);
+      rerender();
+    });
+  }
+  document.getElementById("metric").addEventListener("change", e => {
+    state.metric = e.target.value; rerender();
+  });
+  document.getElementById("days").addEventListener("change", e => {
+    state.days = +e.target.value; rerender();
+  });
+}
+
+//
+// 5. Plan: pick the edges DJ would walk for the current request.
+//
+function plan() {
+  const active = new Set();
+  const metricNode = state.metric === "dau" ? "m.dau" : "m.avg";
+  active.add("src.session→xf.active");
+  active.add("xf.active→" + metricNode);
+  if (state.dims.size > 0 || state.filters.size > 0) {
+    active.add("src.user→dim.user");
+    active.add("dim.user→xf.active");
+  }
+  return { active, metricNode };
+}
+
+//
+// 6. SQL generation. Two dialects to show DJ's re-targeting power.
+//
+function genSQL() {
+  const useUserDim = state.dims.size > 0 || state.filters.size > 0;
+  const selectCols = [];
+  const groupCols = [];
+  if (state.dims.has("country"))   { selectCols.push("u.country");   groupCols.push("u.country"); }
+  if (state.dims.has("plan_tier")) { selectCols.push("u.plan_tier"); groupCols.push("u.plan_tier"); }
+  const metricExpr = state.metric === "dau"
+    ? "COUNT(DISTINCT s.user_id) AS dau"
+    : "ROUND(AVG(s.duration_seconds)/60.0, 2) AS avg_session_minutes";
+  selectCols.push(metricExpr);
+
+  const where = [
+    "s.duration_seconds >= 30",
+    `s.event_date >= current_date - interval '${state.days}' day`,
+  ];
+  if (state.filters.has("premium_only")) where.push("u.plan_tier = 'premium'");
+  if (state.filters.has("us_only"))      where.push("u.country = 'US'");
+
+  const lines = [];
+  lines.push(`-- compiled by DJ from metrics.${state.metric}`);
+  lines.push(`SELECT   ${selectCols.join(",\n         ")}`);
+  lines.push(`FROM     warehouse.fact_user_session s`);
+  if (useUserDim) {
+    lines.push(`JOIN     warehouse.dim_user u            -- via declared FK user_id`);
+    lines.push(`  ON     s.user_id = u.user_id`);
+  }
+  lines.push(`WHERE    ${where.join("\n  AND    ")}`);
+  if (groupCols.length) lines.push(`GROUP BY ${groupCols.join(", ")}`);
+  if (groupCols.length) lines.push(`ORDER BY ${groupCols.join(", ")}`);
+  lines.push(`;`);
+  return lines.join("\n");
+}
+
+function highlightSQL(sql) {
+  const KW = ["SELECT","FROM","JOIN","ON","WHERE","AND","GROUP BY","ORDER BY",
+    "AS","INTERVAL","CURRENT_DATE","DISTINCT","COUNT","AVG","ROUND","SUM"];
+  let out = sql
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  // comments
+  out = out.replace(/(--[^\n]*)/g, '<span class="cm">$1</span>');
+  // strings
+  out = out.replace(/('[^']*')/g, '<span class="lit">$1</span>');
+  // numbers
+  out = out.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="lit">$1</span>');
+  // keywords
+  for (const k of KW) {
+    const re = new RegExp("\\b(" + k.replace(" ","\\s+") + ")\\b", "g");
+    out = out.replace(re, '<span class="kw">$1</span>');
+  }
+  return out;
+}
+
+//
+// 7. Toy SQL "executor" — runs the same intent on the JS dataset.
+//
+function execute() {
+  const today = new Date("2026-05-07");
+  const cutoff = new Date(today); cutoff.setDate(today.getDate() - state.days);
+  const cutoffISO = cutoff.toISOString().slice(0,10);
+
+  const users = new Map(warehouse.users.map(u => [u.user_id, u]));
+  const rows = [];
+  for (const s of warehouse.sessions) {
+    if (s.duration_seconds < 30) continue;
+    if (s.event_date < cutoffISO) continue;
+    const u = users.get(s.user_id);
+    if (state.filters.has("premium_only") && u.plan_tier !== "premium") continue;
+    if (state.filters.has("us_only") && u.country !== "US") continue;
+    rows.push({ ...s, ...u });
+  }
+
+  const keyOf = r => {
+    const k = [];
+    if (state.dims.has("country"))   k.push(r.country);
+    if (state.dims.has("plan_tier")) k.push(r.plan_tier);
+    return k.join("¦") || "_all_";
+  };
+
+  const buckets = new Map();
+  for (const r of rows) {
+    const k = keyOf(r);
+    if (!buckets.has(k)) buckets.set(k, { rows:[], usersSet:new Set() });
+    const b = buckets.get(k);
+    b.rows.push(r); b.usersSet.add(r.user_id);
+  }
+
+  const out = [];
+  for (const [k, b] of buckets) {
+    const parts = k === "_all_" ? [] : k.split("¦");
+    const row = {};
+    let i = 0;
+    if (state.dims.has("country"))   row.country   = parts[i++];
+    if (state.dims.has("plan_tier")) row.plan_tier = parts[i++];
+    if (state.metric === "dau") {
+      row.dau = b.usersSet.size;
+    } else {
+      const avg = b.rows.reduce((a,r)=>a+r.duration_seconds,0) / b.rows.length / 60;
+      row.avg_session_minutes = Math.round(avg * 100) / 100;
+    }
+    out.push(row);
+  }
+  // sort by dim cols
+  out.sort((a,b) => {
+    for (const d of ["country","plan_tier"]) {
+      if (state.dims.has(d) && a[d] !== b[d]) return a[d] < b[d] ? -1 : 1;
+    }
+    return 0;
+  });
+  return out;
+}
+
+function renderTable(rows) {
+  const t = document.getElementById("result");
+  if (rows.length === 0) { t.innerHTML = "<tr><td>(no rows)</td></tr>"; return; }
+  const cols = Object.keys(rows[0]);
+  let html = "<thead><tr>";
+  for (const c of cols) html += `<th>${c}</th>`;
+  html += "</tr></thead><tbody>";
+  for (const r of rows) {
+    html += "<tr>";
+    for (const c of cols) {
+      const v = r[c];
+      const cls = (typeof v === "number") ? "num" : "";
+      html += `<td class="${cls}">${v}</td>`;
+    }
+    html += "</tr>";
+  }
+  html += "</tbody>";
+  t.innerHTML = html;
+}
+
+function renderDefinition() {
+  const yaml = `# This is what a metric owner registers once in DJ.
+# Every consumer (dashboard, notebook, API, agent) re-uses it.
+
+- name: warehouse.fact_user_session
+  type: source
+  columns: [user_id, event_date, duration_seconds]
+
+- name: warehouse.dim_user
+  type: source
+  primary_key: [user_id]
+  columns: [user_id, country, plan_tier, signup_date]
+
+# declare the join once — consumers never JOIN by hand again
+- column: warehouse.fact_user_session.user_id
+  dimension: warehouse.dim_user
+  via: user_id
+
+- name: transforms.active_session
+  type: transform
+  query: |
+    SELECT * FROM warehouse.fact_user_session
+    WHERE  duration_seconds >= 30
+
+- name: metrics.dau
+  type: metric
+  query: |
+    SELECT COUNT(DISTINCT user_id) AS dau
+    FROM   transforms.active_session
+
+- name: metrics.avg_session_minutes
+  type: metric
+  query: |
+    SELECT ROUND(AVG(duration_seconds)/60.0, 2) AS avg_session_minutes
+    FROM   transforms.active_session
+
+- name: cubes.daily_engagement
+  type: cube
+  metrics: [metrics.dau, metrics.avg_session_minutes]
+  dimensions: [warehouse.dim_user.country, warehouse.dim_user.plan_tier]
+`;
+  document.getElementById("defn").textContent = yaml;
+}
+
+//
+// 8. Wire everything together.
+//
+function rerender() {
+  const { active } = plan();
+  renderGraph(active);
+  const sql = genSQL();
+  document.getElementById("sql").innerHTML = highlightSQL(sql);
+  renderTable(execute());
+}
+
+mountControls();
+renderDefinition();
+rerender();
+</script>
+</body>
+</html>
